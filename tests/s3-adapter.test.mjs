@@ -1,0 +1,8 @@
+import test from 'node:test';import assert from 'node:assert/strict';import http from 'node:http';
+import {ObjectStore} from '../server/storage.mjs';
+test('S3 adapter signs with tenant:key and uses path-style bucket addressing',async t=>{
+ const seen=[],objects=new Map();const server=http.createServer(async(req,res)=>{const chunks=[];for await(const c of req)chunks.push(c);const key=decodeURIComponent(req.url.split('?')[0]);seen.push({method:req.method,key,auth:req.headers.authorization,host:req.headers.host});if(req.method==='PUT'){objects.set(key,Buffer.concat(chunks));res.writeHead(200,{ETag:'"test"'});res.end();}else if(req.method==='GET'){if(objects.has(key)){res.writeHead(200,{'Content-Type':'application/json'});res.end(objects.get(key));}else{res.writeHead(404,{'Content-Type':'application/xml'});res.end('<Error><Code>NoSuchKey</Code></Error>');}}else if(req.method==='DELETE'){objects.delete(key);res.writeHead(204);res.end();}else{res.writeHead(200);res.end();}});
+ await new Promise(r=>server.listen(0,'127.0.0.1',r));const endpoint='http://127.0.0.1:'+server.address().port;const store=new ObjectStore({bucket:'cloudru-aij-leads',endpoint,region:'ru-central-1',accessKeyId:'tenant-id:key-id',secretAccessKey:'test-only'});t.after(()=>{store.close();return new Promise(r=>server.close(r));});
+ await store.put('checks/test.json',{ok:true});assert.deepEqual(await store.json('checks/test.json'),{ok:true});await store.remove('checks/test.json');assert.equal(await store.get('checks/test.json'),null);
+ assert.equal(seen[0].key,'/cloudru-aij-leads/checks/test.json');assert.match(seen[0].auth,/Credential=tenant-id:key-id\//);assert.match(seen[0].auth,/ru-central-1\/s3\/aws4_request/);assert.equal(seen[0].host,'127.0.0.1:'+server.address().port);
+});
