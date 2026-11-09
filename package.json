@@ -1,0 +1,23 @@
+{
+  "name": "cloudru-aij-panel",
+  "version": "2.0.0",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "start": "node server/index.mjs",
+    "test": "node --test tests/*.test.mjs",
+    "check:storage": "node scripts/check-storage.mjs",
+    "export:sessions": "node scripts/export-sessions.mjs",
+    "documents:retry": "node scripts/retry-documents.mjs",
+    "export:leads": "node scripts/export-leads.mjs",
+    "dev": "node scripts/preview.mjs"
+  },
+  "dependencies": {
+    "@aws-sdk/client-s3": "3.1156.0",
+    "@smithy/node-http-handler": "4.12.1",
+    "docx": "9.14.0"
+  }
+}
