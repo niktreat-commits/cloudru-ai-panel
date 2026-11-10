@@ -1,0 +1,1188 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Cloud.ru — подбор ИИ-решения для стенда",
+    "version": "1.0.0",
+    "description": "Каталог и предварительная оценка. API не принимает контакты и не хранит историю. Локальный адрес в примере заменяется на HTTPS-адрес тестового Container App."
+  },
+  "servers": [
+    {
+      "url": "http://localhost:8080",
+      "description": "Локальный запуск"
+    }
+  ],
+  "paths": {
+    "/api/catalog": {
+      "get": {
+        "operationId": "getCatalog",
+        "summary": "Каталог для экранов выбора",
+        "description": "Загрузить один раз. Маршрут выбирается по ключу industry:role, а задачи строятся из tasks и taskOverrides.",
+        "responses": {
+          "200": {
+            "description": "Каталог",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Catalog"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Домен фронта не разрешён",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/estimate": {
+      "post": {
+        "operationId": "estimate",
+        "summary": "Оценка нагрузки, бюджета и сервисов",
+        "description": "Пропущенные параметры получают значения из каталога. Для части сценариев цена появится только после замера. Не отправляйте контакты или свободный текст.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EstimateInput"
+              },
+              "example": {
+                "industry": "gov",
+                "role": "it",
+                "task": "access",
+                "placement": "cloud",
+                "values": {
+                  "volume": 300,
+                  "frequency": 10
+                },
+                "settings": {
+                  "modelId": "gpt-oss-120b",
+                  "launch": "api"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Результат расчёта, включая состояния без цены",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Estimate"
+                },
+                "example": {
+                  "apiVersion": "1.0.0",
+                  "methodVersion": "2026-10-23.2",
+                  "pricing": {
+                    "currency": "RUB",
+                    "snapshotDate": "2026-10-12",
+                    "vatIncluded": true,
+                    "sources": [
+                      {
+                        "title": "Тарифы «Evolution Foundation Models». Приложение №7.EVO.11.2",
+                        "url": "https://cloud.ru/documents/tariffs/evolution/foundation-models"
+                      },
+                      {
+                        "title": "Тарифы «Evolution Compute. GPU». Приложение №7.EVO.1G, версия 260909",
+                        "url": "https://cloud.ru/documents/tariffs/evolution/evolution-compute-gpu"
+                      },
+                      {
+                        "title": "Тарифы «Evolution Bare Metal». Приложение №7.EVO.5, версия 260910",
+                        "url": "https://cloud.ru/documents/tariffs/evolution/evolution-bare-metal"
+                      }
+                    ]
+                  },
+                  "selection": {
+                    "industry": "gov",
+                    "role": "it",
+                    "task": "access",
+                    "placement": "cloud",
+                    "values": {
+                      "volume": 300,
+                      "frequency": 10
+                    },
+                    "settings": {
+                      "modelId": "gpt-oss-120b",
+                      "days": 22,
+                      "hours": 8,
+                      "gpuSchedule": "always",
+                      "sensitive": false,
+                      "isolation": false,
+                      "launch": "api"
+                    }
+                  },
+                  "scenario": {
+                    "id": "access",
+                    "title": "Готовые модели для вашей команды",
+                    "name": "Дать команде доступ к моделям",
+                    "description": "Подключить готовые модели к рабочим инструментам",
+                    "outcome": "Доступ к моделям по единому API для внедрения ИИ в приложения и рабочие инструменты."
+                  },
+                  "budget": {
+                    "status": "ready",
+                    "amountRub": 4106.52,
+                    "period": "в месяц",
+                    "scope": "Только обращения к модели по API",
+                    "note": "Сумма складывается из входных и выходных токенов. Входные — 15,86 ₽, выходные — 61 ₽ за 1 млн токенов."
+                  },
+                  "selectedLaunch": "api",
+                  "model": {
+                    "id": "gpt-oss-120b",
+                    "name": "gpt-oss-120b"
+                  },
+                  "workload": {
+                    "requests": 66000,
+                    "inputTokens": 132000000,
+                    "outputTokens": 33000000,
+                    "stats": [
+                      {
+                        "value": 66000,
+                        "label": "обращений в месяц"
+                      },
+                      {
+                        "value": 300,
+                        "label": "активных пользователей"
+                      }
+                    ],
+                    "formula": "Пользователи × 10 обращений в день × 22 дней.",
+                    "assumptions": [
+                      "На обращение принято 2000 входных и 500 выходных токенов, включая контекст и ответ. Повторные попытки и дополнительные проходы не учтены."
+                    ],
+                    "billableHours": 0
+                  },
+                  "options": [
+                    {
+                      "id": "api",
+                      "title": "Готовая модель по API",
+                      "product": "Evolution Foundation Models",
+                      "description": "Платите за обращения к готовой модели.",
+                      "available": true,
+                      "reason": null,
+                      "amountRub": 4106.52,
+                      "gpuCount": 0
+                    },
+                    {
+                      "id": "mli",
+                      "title": "Модель на управляемых GPU",
+                      "product": "Evolution ML Inference",
+                      "description": "GPU для выбранной модели; управление запуском — в сервисе.",
+                      "available": true,
+                      "reason": null,
+                      "amountRub": 1246841.03,
+                      "gpuCount": 2
+                    },
+                    {
+                      "id": "vm",
+                      "title": "Виртуальная машина с GPU",
+                      "product": "Evolution Compute GPU",
+                      "description": "GPU для своей среды и настройки модельного сервера.",
+                      "available": true,
+                      "reason": null,
+                      "amountRub": 1246840,
+                      "gpuCount": 2
+                    },
+                    {
+                      "id": "bm",
+                      "title": "Выделенный GPU-сервер",
+                      "product": "Bare Metal",
+                      "description": "Аренда целого сервера на месяц.",
+                      "available": true,
+                      "reason": null,
+                      "amountRub": 5444250,
+                      "gpuCount": 8
+                    }
+                  ],
+                  "services": [
+                    {
+                      "id": "fm",
+                      "name": "Foundation Models",
+                      "description": "Готовые модели по API без настройки своей GPU-инфраструктуры."
+                    }
+                  ],
+                  "parameters": [
+                    {
+                      "id": "volume",
+                      "label": "Активных пользователей",
+                      "value": 300,
+                      "display": "300 пользователей"
+                    },
+                    {
+                      "id": "frequency",
+                      "label": "Обращений на человека в день",
+                      "value": 10,
+                      "display": "10 обращений"
+                    }
+                  ],
+                  "excluded": [
+                    "Хранение данных",
+                    "Интеграции и внедрение",
+                    "Эксплуатация решения и проверка качества"
+                  ],
+                  "nextStep": "Выбрать модели и интерфейс с учётом ваших данных и требований к размещению."
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Неверный JSON или параметры",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Домен фронта не разрешён",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "Превышен размер 8 КБ",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "Ожидается application/json",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Временная ошибка расчёта",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/healthz": {
+      "get": {
+        "operationId": "health",
+        "summary": "Проверка запуска",
+        "responses": {
+          "200": {
+            "description": "Сервер работает",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "ok",
+                    "apiVersion"
+                  ],
+                  "properties": {
+                    "ok": {
+                      "type": "boolean"
+                    },
+                    "apiVersion": {
+                      "type": "string"
+                    }
+                  },
+                  "additionalProperties": false
+                },
+                "example": {
+                  "ok": true,
+                  "apiVersion": "1.0.0"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "IdLabel": {
+        "type": "object",
+        "required": [
+          "id",
+          "name"
+        ],
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
+      "Choice": {
+        "type": "object",
+        "required": [
+          "id",
+          "name",
+          "description",
+          "icon"
+        ],
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "icon": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
+      "OptionPair": {
+        "type": "array",
+        "prefixItems": [
+          {
+            "type": [
+              "string",
+              "number"
+            ]
+          },
+          {
+            "type": "string"
+          }
+        ],
+        "minItems": 2,
+        "maxItems": 2
+      },
+      "Field": {
+        "type": "object",
+        "required": [
+          "label",
+          "type"
+        ],
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "label": {
+            "type": "string"
+          },
+          "type": {
+            "enum": [
+              "number",
+              "select",
+              "boolean"
+            ]
+          },
+          "unit": {
+            "type": "string"
+          },
+          "min": {
+            "type": "number"
+          },
+          "max": {
+            "type": "number"
+          },
+          "value": {
+            "type": [
+              "string",
+              "number",
+              "null"
+            ]
+          },
+          "note": {
+            "type": "string"
+          },
+          "options": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/OptionPair"
+            }
+          },
+          "nullable": {
+            "type": "boolean"
+          },
+          "decimal": {
+            "type": "boolean"
+          }
+        },
+        "additionalProperties": false
+      },
+      "Settings": {
+        "type": "object",
+        "required": [],
+        "properties": {
+          "modelId": {
+            "type": "string",
+            "description": "ID из models каталога. Только для LLM."
+          },
+          "launch": {
+            "type": "string",
+            "enum": [
+              "api",
+              "mli",
+              "vm",
+              "bm"
+            ]
+          },
+          "days": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 31
+          },
+          "hours": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 24
+          },
+          "gpuSchedule": {
+            "type": "string",
+            "enum": [
+              "always",
+              "window"
+            ]
+          },
+          "sensitive": {
+            "type": "boolean"
+          },
+          "isolation": {
+            "type": "boolean"
+          },
+          "epochs": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 20
+          },
+          "trainingHours": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "minimum": 0.1,
+            "maximum": 100000
+          },
+          "trainingGpus": {
+            "type": "integer",
+            "enum": [
+              1,
+              2,
+              4,
+              8
+            ]
+          }
+        },
+        "additionalProperties": false
+      },
+      "Task": {
+        "type": "object",
+        "required": [
+          "id",
+          "name",
+          "description",
+          "title",
+          "outcome",
+          "icon",
+          "kind",
+          "fields",
+          "launchIds",
+          "settingIds",
+          "defaults"
+        ],
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "outcome": {
+            "type": "string"
+          },
+          "icon": {
+            "type": "string"
+          },
+          "kind": {
+            "enum": [
+              "llm",
+              "resources",
+              "vision",
+              "training",
+              "experiment",
+              "custom"
+            ]
+          },
+          "fields": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Field"
+            }
+          },
+          "launchIds": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "settingIds": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "defaults": {
+            "type": "object",
+            "required": [
+              "values",
+              "settings"
+            ],
+            "properties": {
+              "values": {
+                "type": "object",
+                "additionalProperties": {
+                  "type": [
+                    "string",
+                    "number",
+                    "null"
+                  ]
+                }
+              },
+              "settings": {
+                "$ref": "#/components/schemas/Settings"
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false
+      },
+      "TaskOverride": {
+        "type": "object",
+        "description": "Набор полей Task, которые заменяют соответствующие поля базовой задачи. Поля и defaults заменяются целиком.",
+        "additionalProperties": true
+      },
+      "Route": {
+        "type": "object",
+        "required": [
+          "roleLabel",
+          "recommendedTaskIds",
+          "taskOverrides"
+        ],
+        "properties": {
+          "roleLabel": {
+            "type": "string"
+          },
+          "recommendedTaskIds": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "taskOverrides": {
+            "type": "object",
+            "additionalProperties": {
+              "$ref": "#/components/schemas/TaskOverride"
+            }
+          }
+        },
+        "additionalProperties": false
+      },
+      "Launch": {
+        "type": "object",
+        "required": [
+          "id",
+          "title",
+          "product",
+          "description"
+        ],
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "product": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
+      "Pricing": {
+        "type": "object",
+        "required": [
+          "currency",
+          "snapshotDate",
+          "vatIncluded",
+          "sources"
+        ],
+        "properties": {
+          "currency": {
+            "const": "RUB"
+          },
+          "snapshotDate": {
+            "type": "string",
+            "format": "date"
+          },
+          "vatIncluded": {
+            "type": "boolean"
+          },
+          "sources": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": [
+                "title",
+                "url"
+              ],
+              "properties": {
+                "title": {
+                  "type": "string"
+                },
+                "url": {
+                  "type": "string"
+                }
+              },
+              "additionalProperties": false
+            }
+          }
+        },
+        "additionalProperties": false
+      },
+      "Catalog": {
+        "type": "object",
+        "required": [
+          "apiVersion",
+          "methodVersion",
+          "pricing",
+          "kiosk",
+          "industries",
+          "roles",
+          "placements",
+          "models",
+          "launches",
+          "settingFields",
+          "taskIds",
+          "tasks",
+          "routes"
+        ],
+        "properties": {
+          "apiVersion": {
+            "type": "string"
+          },
+          "methodVersion": {
+            "type": "string"
+          },
+          "pricing": {
+            "$ref": "#/components/schemas/Pricing"
+          },
+          "kiosk": {
+            "type": "object",
+            "required": [
+              "idleSeconds",
+              "warningSeconds"
+            ],
+            "properties": {
+              "idleSeconds": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "warningSeconds": {
+                "type": "integer",
+                "minimum": 0
+              }
+            },
+            "additionalProperties": false
+          },
+          "industries": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Choice"
+            }
+          },
+          "roles": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Choice"
+            }
+          },
+          "placements": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/IdLabel"
+            }
+          },
+          "models": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/IdLabel"
+            }
+          },
+          "launches": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Launch"
+            }
+          },
+          "settingFields": {
+            "type": "object",
+            "additionalProperties": {
+              "$ref": "#/components/schemas/Field"
+            }
+          },
+          "taskIds": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "tasks": {
+            "type": "object",
+            "additionalProperties": {
+              "$ref": "#/components/schemas/Task"
+            }
+          },
+          "routes": {
+            "type": "object",
+            "additionalProperties": {
+              "$ref": "#/components/schemas/Route"
+            }
+          }
+        },
+        "additionalProperties": false
+      },
+      "EstimateInput": {
+        "type": "object",
+        "required": [
+          "industry",
+          "role",
+          "task"
+        ],
+        "properties": {
+          "industry": {
+            "type": "string",
+            "enum": [
+              "gov",
+              "retail",
+              "construction",
+              "auto",
+              "metal",
+              "other"
+            ]
+          },
+          "role": {
+            "type": "string",
+            "enum": [
+              "it",
+              "dev",
+              "product",
+              "business",
+              "legal",
+              "finance",
+              "other"
+            ]
+          },
+          "task": {
+            "type": "string",
+            "enum": [
+              "knowledge",
+              "documents",
+              "support",
+              "agents",
+              "access",
+              "code",
+              "model",
+              "content",
+              "compare",
+              "template",
+              "extract",
+              "reconcile",
+              "reports",
+              "vision",
+              "experiment",
+              "finetune",
+              "custom"
+            ]
+          },
+          "placement": {
+            "type": "string",
+            "enum": [
+              "cloud",
+              "hybrid",
+              "private",
+              "help"
+            ],
+            "default": "cloud"
+          },
+          "values": {
+            "type": "object",
+            "additionalProperties": {
+              "type": [
+                "string",
+                "number",
+                "null"
+              ]
+            },
+            "description": "Значения полей из tasks[task].fields с учётом taskOverrides. Числа передаются JSON-числами."
+          },
+          "settings": {
+            "$ref": "#/components/schemas/Settings"
+          }
+        },
+        "additionalProperties": false
+      },
+      "Budget": {
+        "type": "object",
+        "required": [
+          "status",
+          "amountRub",
+          "period",
+          "scope",
+          "note"
+        ],
+        "properties": {
+          "status": {
+            "enum": [
+              "ready",
+              "benchmark",
+              "training",
+              "blocked",
+              "placement",
+              "custom"
+            ]
+          },
+          "amountRub": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "minimum": 0
+          },
+          "period": {
+            "enum": [
+              "в месяц",
+              "за запуск"
+            ]
+          },
+          "scope": {
+            "type": "string"
+          },
+          "note": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
+      "Workload": {
+        "type": "object",
+        "required": [
+          "requests",
+          "inputTokens",
+          "outputTokens",
+          "stats",
+          "formula",
+          "assumptions",
+          "billableHours"
+        ],
+        "properties": {
+          "requests": {
+            "type": "number"
+          },
+          "inputTokens": {
+            "type": "number"
+          },
+          "outputTokens": {
+            "type": "number"
+          },
+          "stats": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": [
+                "value",
+                "label"
+              ],
+              "properties": {
+                "value": {
+                  "type": "number"
+                },
+                "label": {
+                  "type": "string"
+                }
+              },
+              "additionalProperties": false
+            }
+          },
+          "formula": {
+            "type": "string"
+          },
+          "assumptions": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "billableHours": {
+            "type": [
+              "number",
+              "null"
+            ]
+          }
+        },
+        "additionalProperties": false
+      },
+      "LaunchOption": {
+        "type": "object",
+        "required": [
+          "id",
+          "title",
+          "product",
+          "description",
+          "available",
+          "reason",
+          "amountRub",
+          "gpuCount"
+        ],
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "product": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "available": {
+            "type": "boolean"
+          },
+          "reason": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "amountRub": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "minimum": 0
+          },
+          "gpuCount": {
+            "type": "integer",
+            "minimum": 0
+          }
+        },
+        "additionalProperties": false
+      },
+      "Estimate": {
+        "type": "object",
+        "required": [
+          "apiVersion",
+          "methodVersion",
+          "pricing",
+          "selection",
+          "scenario",
+          "budget",
+          "selectedLaunch",
+          "model",
+          "workload",
+          "options",
+          "services",
+          "parameters",
+          "excluded",
+          "nextStep"
+        ],
+        "properties": {
+          "apiVersion": {
+            "type": "string"
+          },
+          "methodVersion": {
+            "type": "string"
+          },
+          "pricing": {
+            "$ref": "#/components/schemas/Pricing"
+          },
+          "selection": {
+            "$ref": "#/components/schemas/EstimateInput"
+          },
+          "scenario": {
+            "type": "object",
+            "required": [
+              "id",
+              "title",
+              "name",
+              "description",
+              "outcome"
+            ],
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "title": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              },
+              "description": {
+                "type": "string"
+              },
+              "outcome": {
+                "type": "string"
+              }
+            },
+            "additionalProperties": false
+          },
+          "budget": {
+            "$ref": "#/components/schemas/Budget"
+          },
+          "selectedLaunch": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "model": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/IdLabel"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "workload": {
+            "$ref": "#/components/schemas/Workload"
+          },
+          "options": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/LaunchOption"
+            }
+          },
+          "services": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": [
+                "id",
+                "name",
+                "description"
+              ],
+              "properties": {
+                "id": {
+                  "type": "string"
+                },
+                "name": {
+                  "type": "string"
+                },
+                "description": {
+                  "type": "string"
+                }
+              },
+              "additionalProperties": false
+            }
+          },
+          "parameters": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": [
+                "id",
+                "label",
+                "value",
+                "display"
+              ],
+              "properties": {
+                "id": {
+                  "type": "string"
+                },
+                "label": {
+                  "type": "string"
+                },
+                "value": {
+                  "type": [
+                    "string",
+                    "number",
+                    "null"
+                  ]
+                },
+                "display": {
+                  "type": "string"
+                }
+              },
+              "additionalProperties": false
+            }
+          },
+          "excluded": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "nextStep": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
+      "Error": {
+        "type": "object",
+        "required": [
+          "error",
+          "message"
+        ],
+        "properties": {
+          "error": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          },
+          "field": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      }
+    }
+  }
+}

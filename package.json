@@ -1,0 +1,8 @@
+{
+  "name": "cloudru-panel-api",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "engines": {"node": ">=22"},
+  "scripts": {"start": "node server/index.mjs", "test": "node --test tests/*.test.mjs", "preview:html": "node tools/build-preview.mjs"}
+}
