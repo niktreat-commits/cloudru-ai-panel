@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#222222">
+  <title>Cloud.ru — ИИ для вашей команды</title>
+  <link rel="stylesheet" href="./fonts.css">
+  <link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+  <div class="shell" id="panel">
+    <header class="brand" aria-label="Cloud.ru — облачные и ИИ-сервисы">
+      <img src="./logo.png" alt="Cloud.ru" width="454" height="89">
+      <span class="brand-bars" aria-hidden="true"></span>
+      <span class="brand-tag">облачные<br>и ИИ-сервисы</span>
+    </header>
+    <nav id="progress" class="progress" aria-label="Этапы подбора" hidden></nav>
+    <main id="screen" aria-busy="true">
+      <div class="initial-state"><h1>Подбираем решение</h1><p>Загружаем каталог задач…</p></div>
+    </main>
+    <footer id="navigation" class="navigation" hidden></footer>
+    <div id="idle" class="idle" role="status" hidden></div>
+    <dialog id="dialog" class="dialog" aria-labelledby="dialog-title"></dialog>
+  </div>
+  <script type="module" src="./bootstrap.mjs"></script>
+</body>
+</html>

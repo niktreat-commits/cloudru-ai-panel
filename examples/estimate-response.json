@@ -1,0 +1,150 @@
+{
+  "apiVersion": "1.0.0",
+  "methodVersion": "2026-10-23.2",
+  "pricing": {
+    "currency": "RUB",
+    "snapshotDate": "2026-10-12",
+    "vatIncluded": true,
+    "sources": [
+      {
+        "title": "Тарифы «Evolution Foundation Models». Приложение №7.EVO.11.2",
+        "url": "https://cloud.ru/documents/tariffs/evolution/foundation-models"
+      },
+      {
+        "title": "Тарифы «Evolution Compute. GPU». Приложение №7.EVO.1G, версия 260909",
+        "url": "https://cloud.ru/documents/tariffs/evolution/evolution-compute-gpu"
+      },
+      {
+        "title": "Тарифы «Evolution Bare Metal». Приложение №7.EVO.5, версия 260910",
+        "url": "https://cloud.ru/documents/tariffs/evolution/evolution-bare-metal"
+      }
+    ]
+  },
+  "selection": {
+    "industry": "gov",
+    "role": "it",
+    "task": "access",
+    "placement": "cloud",
+    "values": {
+      "volume": 300,
+      "frequency": 10
+    },
+    "settings": {
+      "modelId": "gpt-oss-120b",
+      "days": 22,
+      "hours": 8,
+      "gpuSchedule": "always",
+      "sensitive": false,
+      "isolation": false,
+      "launch": "api"
+    }
+  },
+  "scenario": {
+    "id": "access",
+    "title": "Готовые модели для вашей команды",
+    "name": "Дать команде доступ к моделям",
+    "description": "Подключить готовые модели к рабочим инструментам",
+    "outcome": "Доступ к моделям по единому API для внедрения ИИ в приложения и рабочие инструменты."
+  },
+  "budget": {
+    "status": "ready",
+    "amountRub": 4106.52,
+    "period": "в месяц",
+    "scope": "Только обращения к модели по API",
+    "note": "Сумма складывается из входных и выходных токенов. Входные — 15,86 ₽, выходные — 61 ₽ за 1 млн токенов."
+  },
+  "selectedLaunch": "api",
+  "model": {
+    "id": "gpt-oss-120b",
+    "name": "gpt-oss-120b"
+  },
+  "workload": {
+    "requests": 66000,
+    "inputTokens": 132000000,
+    "outputTokens": 33000000,
+    "stats": [
+      {
+        "value": 66000,
+        "label": "обращений в месяц"
+      },
+      {
+        "value": 300,
+        "label": "активных пользователей"
+      }
+    ],
+    "formula": "Пользователи × 10 обращений в день × 22 дней.",
+    "assumptions": [
+      "На обращение принято 2000 входных и 500 выходных токенов, включая контекст и ответ. Повторные попытки и дополнительные проходы не учтены."
+    ],
+    "billableHours": 0
+  },
+  "options": [
+    {
+      "id": "api",
+      "title": "Готовая модель по API",
+      "product": "Evolution Foundation Models",
+      "description": "Платите за обращения к готовой модели.",
+      "available": true,
+      "reason": null,
+      "amountRub": 4106.52,
+      "gpuCount": 0
+    },
+    {
+      "id": "mli",
+      "title": "Модель на управляемых GPU",
+      "product": "Evolution ML Inference",
+      "description": "GPU для выбранной модели; управление запуском — в сервисе.",
+      "available": true,
+      "reason": null,
+      "amountRub": 1246841.03,
+      "gpuCount": 2
+    },
+    {
+      "id": "vm",
+      "title": "Виртуальная машина с GPU",
+      "product": "Evolution Compute GPU",
+      "description": "GPU для своей среды и настройки модельного сервера.",
+      "available": true,
+      "reason": null,
+      "amountRub": 1246840,
+      "gpuCount": 2
+    },
+    {
+      "id": "bm",
+      "title": "Выделенный GPU-сервер",
+      "product": "Bare Metal",
+      "description": "Аренда целого сервера на месяц.",
+      "available": true,
+      "reason": null,
+      "amountRub": 5444250,
+      "gpuCount": 8
+    }
+  ],
+  "services": [
+    {
+      "id": "fm",
+      "name": "Foundation Models",
+      "description": "Готовые модели по API без настройки своей GPU-инфраструктуры."
+    }
+  ],
+  "parameters": [
+    {
+      "id": "volume",
+      "label": "Активных пользователей",
+      "value": 300,
+      "display": "300 пользователей"
+    },
+    {
+      "id": "frequency",
+      "label": "Обращений на человека в день",
+      "value": 10,
+      "display": "10 обращений"
+    }
+  ],
+  "excluded": [
+    "Хранение данных",
+    "Интеграции и внедрение",
+    "Эксплуатация решения и проверка качества"
+  ],
+  "nextStep": "Выбрать модели и интерфейс с учётом ваших данных и требований к размещению."
+}

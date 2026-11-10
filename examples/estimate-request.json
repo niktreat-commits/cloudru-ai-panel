@@ -1,0 +1,14 @@
+{
+  "industry": "gov",
+  "role": "it",
+  "task": "access",
+  "placement": "cloud",
+  "values": {
+    "volume": 300,
+    "frequency": 10
+  },
+  "settings": {
+    "modelId": "gpt-oss-120b",
+    "launch": "api"
+  }
+}
