@@ -1,6 +1,7 @@
 import test from 'node:test';import assert from 'node:assert/strict';
-import {defaultCalculation,deriveWorkload,estimateScenario,normalizeField,SCENARIOS} from '../dist/scenario-calculator.mjs';
-import {pricing} from './helpers.mjs';
+import {defaultCalculation,deriveWorkload,estimateScenario,normalizeField,SCENARIOS} from '../core/scenario-calculator.mjs';
+import {readFileSync} from 'node:fs';
+const pricing=JSON.parse(readFileSync(new URL('../core/pricing.json',import.meta.url),'utf8'));
 test('developer chat uses active share and a freely adjustable frequency above 60',()=>{
  const c=defaultCalculation('code');Object.assign(c.values,{volume:100,activePercent:40,frequency:150});const w=deriveWorkload(c);
  assert.equal(w.requests,100*0.4*150*22);assert.equal(w.perIn,6000);assert.equal(w.perOut,1200);
